@@ -1,67 +1,209 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-const FlowNode = ({ title, delay, isLast }) => (
-  <motion.div 
-    initial={{ opacity: 0, x: -20 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.5, delay: delay }}
-    className="flex flex-col items-center gap-4 relative z-10 w-full md:w-auto"
-  >
-    <div className="w-16 h-16 rounded-2xl bg-surface border border-divider flex items-center justify-center shadow-2xl relative group">
-      <div className="absolute inset-0 bg-accent/5 rounded-2xl blur-md group-hover:bg-accent/10 transition-colors" />
-      <div className="w-3 h-3 rounded-full bg-accent shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-    </div>
-    <span className="text-sm font-medium text-secondaryText uppercase tracking-wider text-center">{title}</span>
-    
-    {!isLast && (
-      <div className="md:hidden w-[1px] h-12 bg-divider" />
-    )}
-  </motion.div>
-);
+gsap.registerPlugin(ScrollTrigger);
+
+const steps = [
+  'Raw Data',
+  'Event Intelligence',
+  'Pattern Discovery',
+  'Predictive Understanding',
+  'Actionable Decisions',
+];
 
 const HowItWorks = () => {
-  const steps = [
-    "Raw Data",
-    "Event Intelligence",
-    "Pattern Discovery",
-    "Predictive Understanding",
-    "Actionable Decisions"
-  ];
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const lineRef = useRef(null);
+  const nodeRefs = useRef([]);
+  const pulseRef = useRef(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    // Title fade-in
+    gsap.fromTo(titleRef.current,
+      { opacity: 0, y: 24 },
+      {
+        opacity: 1, y: 0, duration: 0.8,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: titleRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
+      }
+    );
+
+    // Line draw
+    gsap.fromTo(lineRef.current,
+      { scaleX: 0 },
+      {
+        scaleX: 1,
+        transformOrigin: 'left center',
+        duration: 1.2,
+        ease: 'power2.inOut',
+        scrollTrigger: { trigger: section, start: 'top 70%', toggleActions: 'play none none reverse' },
+      }
+    );
+
+    // Nodes stagger
+    nodeRefs.current.forEach((el, i) => {
+      if (!el) return;
+      gsap.fromTo(el,
+        { opacity: 0, y: 32, scale: 0.88 },
+        {
+          opacity: 1, y: 0, scale: 1,
+          duration: 0.6,
+          delay: i * 0.12,
+          ease: 'back.out(1.5)',
+          scrollTrigger: { trigger: section, start: 'top 72%', toggleActions: 'play none none reverse' },
+        }
+      );
+    });
+
+    // Scroll-driven pulse (moves pulse dot across the line on scroll)
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top 70%',
+      end: 'bottom 30%',
+      scrub: 1.5,
+      onUpdate: (self) => {
+        if (pulseRef.current) {
+          pulseRef.current.style.left = `${self.progress * 100}%`;
+        }
+      },
+    });
+
+    return () => ScrollTrigger.getAll()
+      .filter(t => t.vars.trigger === section || t.vars.trigger === titleRef.current)
+      .forEach(t => t.kill());
+  }, []);
 
   return (
-    <section className="py-24 bg-background relative border-t border-divider/20">
-      <div className="max-w-6xl mx-auto px-6">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-white">From Chaos to Clarity</h2>
-        </motion.div>
+    <section
+      ref={sectionRef}
+      style={{
+        padding: '7rem 1.5rem',
+        background: '#0B0F14',
+        borderTop: '1px solid rgba(31,41,51,0.6)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Subtle dark vignette gradient for mood */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.4) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
 
-        <div className="relative flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
-          {/* Horizontal Line for Desktop */}
-          <div className="absolute top-[2rem] left-0 w-full h-[1px] bg-divider hidden md:block -z-0" />
-          
-          {/* Moving Pulse for Desktop */}
-          <motion.div 
-            initial={{ left: "0%" }}
-            whileInView={{ left: "100%" }}
-            viewport={{ once: true }}
-            transition={{ duration: 3, ease: "linear", repeat: Infinity, repeatDelay: 1 }}
-            className="absolute top-[2rem] h-[1px] w-20 bg-gradient-to-r from-transparent via-accent to-transparent hidden md:block -z-0"
+      <div style={{ maxWidth: '72rem', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <div ref={titleRef} style={{ textAlign: 'center', marginBottom: '5rem', opacity: 0 }}>
+          <h2 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', fontWeight: 700, color: '#fff' }}>
+            From Chaos to Clarity
+          </h2>
+        </div>
+
+        {/* Flow bar */}
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0' }}>
+          {/* Base line */}
+          <div style={{
+            position: 'absolute',
+            top: '2rem',
+            left: '0',
+            width: '100%',
+            height: '1px',
+            background: 'rgba(31,41,51,0.8)',
+          }} />
+
+          {/* Animated line fill */}
+          <div
+            ref={lineRef}
+            style={{
+              position: 'absolute',
+              top: '2rem',
+              left: '0',
+              width: '100%',
+              height: '1px',
+              background: 'linear-gradient(to right, rgba(99,102,241,0.6), rgba(34,211,238,0.6))',
+              transformOrigin: 'left center',
+              scaleX: 0,
+            }}
           />
 
-          {steps.map((step, index) => (
-            <FlowNode 
-              key={index} 
-              title={step} 
-              delay={index * 0.2} 
-              isLast={index === steps.length - 1} 
-            />
+          {/* Scroll-driven pulse dot */}
+          <div
+            ref={pulseRef}
+            style={{
+              position: 'absolute',
+              top: 'calc(2rem - 4px)',
+              left: '0%',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#6366F1',
+              boxShadow: '0 0 12px rgba(99,102,241,0.8)',
+              transform: 'translateX(-50%)',
+              transition: 'left 0.05s linear',
+            }}
+          />
+
+          {steps.map((step, i) => (
+            <div
+              key={i}
+              ref={(el) => (nodeRefs.current[i] = el)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem',
+                opacity: 0,
+                flex: 1,
+              }}
+            >
+              <div style={{
+                width: '4rem',
+                height: '4rem',
+                borderRadius: '14px',
+                background: 'rgba(17,24,39,0.9)',
+                border: '1px solid rgba(31,41,51,0.9)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+                transition: 'border-color 0.3s, box-shadow 0.3s',
+              }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(99,102,241,0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(31,41,51,0.9)';
+                  e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+                }}
+              >
+                <div style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  background: '#6366F1',
+                  boxShadow: '0 0 8px rgba(99,102,241,0.6)',
+                }} />
+              </div>
+              <span style={{
+                fontSize: '0.7rem',
+                fontWeight: 500,
+                color: '#6B7280',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                textAlign: 'center',
+                maxWidth: '80px',
+                lineHeight: 1.4,
+              }}>
+                {step}
+              </span>
+            </div>
           ))}
         </div>
       </div>

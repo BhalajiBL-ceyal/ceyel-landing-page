@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Lenis smooth scroll ─────────────────────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Ensure Lenis takes full scroll control */
+html {
+  scroll-behavior: auto;
+}
+
+/* ── Base body ───────────────────────────────────────────────────────────── */
+/* Prevent horizontal scroll without breaking position:sticky */
+/* overflow-x: clip does NOT create a scroll container (unlike hidden) */
+html, body {
+  overflow-x: clip;
+}
+
 @layer base {
   body {
     @apply bg-background text-primaryText font-sans;
@@ -10,9 +44,9 @@
   }
 }
 
-/* Custom Scrollbar */
+/* ── Custom scrollbar ────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -20,5 +54,78 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-divider rounded-full hover:bg-surface;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* ── Keyframes ───────────────────────────────────────────────────────────── */
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lineGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.7; }
+}
+
+/* ── Section transition gradient helpers ─────────────────────────────────── */
+.section-fade-top {
+  position: relative;
+}
+.section-fade-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, #0B0F14, transparent);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Magnetic button base ────────────────────────────────────────────────── */
+.magnetic-btn {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.3s ease;
+}
+
+/* ── Word highlight animation ────────────────────────────────────────────── */
+.word-highlight {
+  display: inline;
+  transition: color 0.4s ease, opacity 0.4s ease;
+}
+
+/* ── Canvas outline reset ────────────────────────────────────────────────── */
+canvas {
+  outline: none;
+}
+
+/* ── Premium gradient text utility ──────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #1D1D1F 0%, #6E6E73 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Custom Cursor Overrides ────────────────────────────────────────────── */
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: default !important; /* Will let system default fallback in case custom cursor struggles */
 }

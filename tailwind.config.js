@@ -7,15 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B0F14',
-        surface: '#111827',
-        primaryText: '#E5E7EB',
-        secondaryText: '#9CA3AF',
+        background: '#FFFFFF', // Pure white
+        secondaryBg: '#F5F5F7', // Apple light gray
+        surface: '#FFFFFF',
+        primaryText: '#1D1D1F', // Apple near black
+        secondaryText: '#6E6E73', // Apple text gray
         accent: {
-          DEFAULT: '#6366F1', // Indigo
-          secondary: '#22D3EE', // Soft Cyan
+          DEFAULT: '#0071E3', // Apple minimal blue
+          secondary: '#E5E7EB', // Subtle neutral
         },
-        divider: '#1F2933',
+        divider: '#E5E7EB',
       },
       fontFamily: {
         sans: ['Inter', 'Manrope', 'sans-serif'],
