@@ -124,8 +124,4 @@ canvas {
   background-clip: text;
 }
 
-/* ── Custom Cursor Overrides ────────────────────────────────────────────── */
-body.custom-cursor-active,
-body.custom-cursor-active * {
-  cursor: default !important; /* Will let system default fallback in case custom cursor struggles */
-}
+
